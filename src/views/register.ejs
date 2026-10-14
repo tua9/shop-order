@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký tài khoản - Tuấn Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container auth-container">
+    <div class="auth-header">
+      <div class="auth-icon-circle">📝</div>
+      <h1 class="title" style="margin-bottom: 8px;">Đăng Ký Tài Khoản</h1>
+      <p class="auth-subtitle">Tạo tài khoản để bắt đầu đặt hàng</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/register" method="POST">
+      <input type="hidden" name="redirect" value="<%= redirectUrl %>">
+
+      <div class="form-group">
+        <label for="fullName">Họ và tên</label>
+        <input 
+          type="text" 
+          id="fullName" 
+          name="fullName" 
+          placeholder="Ví dụ: Nguyễn Văn A" 
+          value="<%= formData && formData.fullName ? formData.fullName : '' %>"
+          required 
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Nhập tên đăng nhập" 
+          value="<%= formData && formData.username ? formData.username : '' %>"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Tối thiểu 6 ký tự" 
+          minlength="6"
+          autocomplete="new-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn-primary-form">Đăng Ký</button>
+      <a href="/" class="btn-secondary-form">Quay Lại Trang Chủ</a>
+    </form>
+
+    <div class="auth-footer-links">
+      Đã có tài khoản? <a href="/login<%= redirectUrl ? '?redirect=' + encodeURIComponent(redirectUrl) : '' %>">Đăng nhập ngay</a>
+    </div>
+  </div>
+</body>
+</html>

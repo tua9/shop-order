@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập hệ thống - Tuấn Shop</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container auth-container">
+    <div class="auth-header">
+      <div class="auth-icon-circle">🔐</div>
+      <h1 class="title" style="margin-bottom: 8px;">Đăng Nhập</h1>
+      <p class="auth-subtitle">Vui lòng đăng nhập để tạo và quản lý đơn hàng</p>
+    </div>
+
+    <% if (error) { %>
+      <div class="alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <!-- Quick Demo Accounts Box -->
+    <div class="demo-box">
+      <div class="demo-box-title">
+        <span>⚡ Tài khoản mẫu (Bấm để điền nhanh):</span>
+      </div>
+      <div class="demo-chips">
+        <button type="button" class="demo-chip" onclick="fillCredentials('admin', '123456')">
+          admin <span class="demo-chip-sub">(123456 - Quản trị)</span>
+        </button>
+        <button type="button" class="demo-chip" onclick="fillCredentials('tuandz', '123456')">
+          tuandz <span class="demo-chip-sub">(123456 - Khách)</span>
+        </button>
+      </div>
+    </div>
+
+    <form action="/login" method="POST" id="loginForm">
+      <input type="hidden" name="redirect" value="<%= redirectUrl %>">
+
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Nhập username" 
+          value="<%= formData && formData.username ? formData.username : '' %>"
+          autocomplete="username"
+          required 
+          autofocus
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Nhập mật khẩu" 
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn-primary-form">Đăng Nhập</button>
+      <a href="/" class="btn-secondary-form">Quay Lại Trang Chủ</a>
+    </form>
+
+    <div class="auth-footer-links">
+      Chưa có tài khoản? <a href="/register<%= redirectUrl ? '?redirect=' + encodeURIComponent(redirectUrl) : '' %>">Đăng ký tài khoản mới</a>
+    </div>
+  </div>
+
+  <script>
+    function fillCredentials(user, pass) {
+      document.getElementById('username').value = user;
+      document.getElementById('password').value = pass;
+    }
+  </script>
+</body>
+</html>
