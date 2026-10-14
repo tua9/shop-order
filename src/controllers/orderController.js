@@ -1,12 +1,31 @@
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 
+// Helper to check if current user owns the order (or is admin)
+const isOrderOwner = (order, user) => {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (order.userId && user.userId && order.userId.toString() === user.userId.toString()) {
+    return true;
+  }
+  // Fallback for sample or existing orders matched by customerName
+  if (
+    order.customerName &&
+    ((user.fullName && order.customerName.trim().toLowerCase() === user.fullName.trim().toLowerCase()) ||
+     (user.username && order.customerName.trim().toLowerCase() === user.username.trim().toLowerCase()))
+  ) {
+    return true;
+  }
+  return false;
+};
+
 // @desc    Retrieve the list of product orders (Requirement 5)
 // @route   GET / or GET /orders
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ orderDate: -1, createdAt: -1 });
-    res.render('order', { orders });
+    const error = req.query.error || null;
+    res.render('order', { orders, error });
   } catch (error) {
     console.error('Error fetching orders:', error);
     res.status(500).send('Server Error: ' + error.message);
@@ -71,6 +90,7 @@ exports.createOrder = async (req, res) => {
     const totalPrice = existingProduct.unitPrice * qty;
 
     await Order.create({
+      userId: req.session?.user?.userId || null,
       customerName: customerName.trim(),
       productName: existingProduct.productName,
       quantity: qty,
@@ -98,6 +118,12 @@ exports.getUpdateOrderPage = async (req, res) => {
     if (!order) {
       return res.status(404).send('Order not found');
     }
+
+    // Enforce ownership: only owner or admin can update
+    if (!isOrderOwner(order, req.session?.user)) {
+      return res.redirect('/?error=' + encodeURIComponent('Bạn chỉ có thể cập nhật đơn hàng của chính mình.'));
+    }
+
     const products = await Product.find();
     res.render('updateOrder', { order, products, error: null });
   } catch (error) {
@@ -114,6 +140,11 @@ exports.updateOrder = async (req, res) => {
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).send('Order not found');
+    }
+
+    // Enforce ownership: only owner or admin can update
+    if (!isOrderOwner(order, req.session?.user)) {
+      return res.redirect('/?error=' + encodeURIComponent('Bạn không có quyền cập nhật đơn hàng của người khác.'));
     }
 
     const products = await Product.find();
@@ -167,6 +198,16 @@ exports.updateOrder = async (req, res) => {
 // @route   GET /orders/delete/:id or POST /orders/delete/:id
 exports.deleteOrder = async (req, res) => {
   try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // Enforce ownership: only owner or admin can delete
+    if (!isOrderOwner(order, req.session?.user)) {
+      return res.redirect('/?error=' + encodeURIComponent('Bạn không có quyền xóa đơn hàng của người khác.'));
+    }
+
     await Order.findByIdAndDelete(req.params.id);
     res.redirect('/');
   } catch (error) {
