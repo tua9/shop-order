@@ -90,7 +90,8 @@ body {
 .price-text {
   font-weight: 500;
   color: #333333;
-  margin-left: 4px;
+  margin-right: 6px;
+  min-width: 100px;
 }
 
 .btn-update {

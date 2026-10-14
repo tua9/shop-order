@@ -87,13 +87,13 @@
               </td>
               <td>
                 <div class="action-cell">
+                  <span class="price-text">
+                    <%= order.totalPrice ? order.totalPrice.toLocaleString('vi-VN') : 0 %> VND
+                  </span>
                   <% if (isOwner) { %>
                     <a href="/orders/update/<%= order._id %>" class="btn-update">Update</a>
                     <a href="/orders/delete/<%= order._id %>" class="btn-delete" onclick="return confirm('Are you sure you want to delete this order?');">Delete</a>
                   <% } %>
-                  <span class="price-text" style="<%= !isOwner ? 'margin-left: 0;' : '' %>">
-                    <%= order.totalPrice ? order.totalPrice.toLocaleString('vi-VN') : 0 %> VND
-                  </span>
                 </div>
               </td>
             </tr>
